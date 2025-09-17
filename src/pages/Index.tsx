@@ -5,23 +5,17 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { Sparkles, Zap, Brain, Rocket, Target, Users, Code, Cloud, Shield, Palette, Star, ArrowRight, MessageCircle, BookOpen, Trophy, ChevronRight } from "lucide-react";
-import { InteractiveForm } from "@/components/InteractiveForm";
-import { CareerResults } from "@/components/CareerResults";
-import { AIChat } from "@/components/AIChat";
+import Dashboard from "@/components/Dashboard";
 import { MouseTracker } from "@/components/MouseTracker";
 
 const Index = () => {
   const [currentStep, setCurrentStep] = useState(0);
-  const [userProfile, setUserProfile] = useState(null);
-  const [showResults, setShowResults] = useState(false);
-  const [showChat, setShowChat] = useState(false);
+  const [showDashboard, setShowDashboard] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const steps = [
     { id: 'welcome', label: 'Welcome', icon: Star },
-    { id: 'profile', label: 'Profile', icon: Users },
-    { id: 'results', label: 'Results', icon: Trophy },
-    { id: 'chat', label: 'AI Chat', icon: MessageCircle }
+    { id: 'dashboard', label: 'Dashboard', icon: Users }
   ];
 
   const careerCategories = [
@@ -69,16 +63,9 @@ const Index = () => {
     }
   ];
 
-  const handleFormSubmit = (profile: any) => {
-    setUserProfile(profile);
-    setShowResults(true);
-    setCurrentStep(2);
-  };
-
   const navigateToStep = (stepIndex: number) => {
     setCurrentStep(stepIndex);
-    if (stepIndex === 2 && !showResults) return;
-    if (stepIndex === 3) setShowChat(true);
+    if (stepIndex === 1) setShowDashboard(true);
   };
 
   return (
@@ -126,10 +113,10 @@ const Index = () => {
                     relative overflow-hidden group transition-all duration-300
                     ${isActive ? "neon-border scale-105" : ""}
                     ${isCompleted ? "bg-primary/20 text-primary" : ""}
-                    ${(!showResults && index === 2) || (index === 3 && !showChat) ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}
+                    ${index === 1 && !showDashboard ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}
                   `}
                   onClick={() => navigateToStep(index)}
-                  disabled={(!showResults && index === 2) || (index === 3 && !showChat)}
+                  disabled={index === 1 && !showDashboard}
                 >
                   <Icon className="h-5 w-5 mr-2" />
                   {step.label}
@@ -178,7 +165,10 @@ const Index = () => {
                   <Button 
                     size="lg" 
                     className="bg-gradient-to-r from-primary to-accent hover:from-primary/80 hover:to-accent/80 transform hover:scale-105 transition-all duration-300"
-                    onClick={() => setCurrentStep(1)}
+                    onClick={() => {
+                      setShowDashboard(true);
+                      setCurrentStep(1);
+                    }}
                   >
                     Get Started
                     <ArrowRight className="ml-2 h-5 w-5" />
@@ -224,27 +214,12 @@ const Index = () => {
             </div>
           )}
 
-          {currentStep === 1 && (
+          {currentStep === 1 && showDashboard && (
             <div className="animate-scale-in">
-              <InteractiveForm onSubmit={handleFormSubmit} />
-            </div>
-          )}
-
-          {currentStep === 2 && showResults && userProfile && (
-            <div className="animate-scale-in">
-              <CareerResults 
-                profile={userProfile} 
-                onStartChat={() => {
-                  setShowChat(true);
-                  setCurrentStep(3);
-                }} 
-              />
-            </div>
-          )}
-
-          {currentStep === 3 && showChat && (
-            <div className="animate-scale-in">
-              <AIChat profile={userProfile} />
+              <Dashboard onBack={() => {
+                setCurrentStep(0);
+                setShowDashboard(false);
+              }} />
             </div>
           )}
         </div>
