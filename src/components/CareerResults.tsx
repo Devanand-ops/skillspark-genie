@@ -28,20 +28,38 @@ interface CareerResultsProps {
     interests: string;
     goals: string;
   };
+  results: any;
+  setResults: (results: any) => void;
   onStartChat: () => void;
 }
 
-export const CareerResults = ({ profile, onStartChat }: CareerResultsProps) => {
-  const [loadingProgress, setLoadingProgress] = useState(0);
-  const [showResults, setShowResults] = useState(false);
+export const CareerResults = ({ profile, results, setResults, onStartChat }: CareerResultsProps) => {
+  const [loadingProgress, setLoadingProgress] = useState(() => {
+    // If we already have results, skip loading
+    return results ? 100 : 0;
+  });
+  const [showResults, setShowResults] = useState(() => {
+    return !!results;
+  });
 
   useEffect(() => {
+    // If results already exist, don't run the loading simulation
+    if (results) {
+      setShowResults(true);
+      return;
+    }
+
     // Simulate AI analysis with loading animation
     const interval = setInterval(() => {
       setLoadingProgress((prev) => {
         if (prev >= 100) {
           clearInterval(interval);
-          setTimeout(() => setShowResults(true), 500);
+          setTimeout(() => {
+            setShowResults(true);
+            // Generate and save results
+            const generatedResults = getCareerRecommendations();
+            setResults(generatedResults);
+          }, 500);
           return 100;
         }
         return prev + 2;
@@ -49,7 +67,7 @@ export const CareerResults = ({ profile, onStartChat }: CareerResultsProps) => {
     }, 50);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [results, setResults]);
 
   const getCareerRecommendations = () => {
     const interestMap: Record<string, any> = {

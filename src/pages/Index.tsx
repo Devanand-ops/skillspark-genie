@@ -4,13 +4,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
-import { Sparkles, Zap, Brain, Rocket, Target, Users, Code, Cloud, Shield, Palette, Star, ArrowRight, MessageCircle, BookOpen, Trophy, ChevronRight } from "lucide-react";
+import { Sparkles, Zap, Brain, Rocket, Target, Users, Code, Cloud, Shield, Palette, Star, ArrowRight, MessageCircle, BookOpen, Trophy, ChevronRight, LogIn, UserPlus } from "lucide-react";
 import Dashboard from "@/components/Dashboard";
 import { MouseTracker } from "@/components/MouseTracker";
 
 const Index = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [showDashboard, setShowDashboard] = useState(false);
+  const [hasCompletedForm, setHasCompletedForm] = useState(false);
+  const [formData, setFormData] = useState(null);
+  const [results, setResults] = useState(null);
+  const [chatHistory, setChatHistory] = useState([]);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const steps = [
@@ -75,6 +79,19 @@ const Index = () => {
       {/* Header */}
       <header className="relative overflow-hidden border-b border-border/50 bg-background/80 backdrop-blur-xl">
         <div className="container mx-auto px-4 py-8">
+          <div className="flex justify-between items-center mb-8">
+            <div className="flex-1"></div>
+            <div className="flex gap-3">
+              <Button variant="outline" size="sm" className="glass-card">
+                <LogIn className="h-4 w-4 mr-2" />
+                Login
+              </Button>
+              <Button size="sm" className="bg-gradient-to-r from-primary to-accent">
+                <UserPlus className="h-4 w-4 mr-2" />
+                Sign Up
+              </Button>
+            </div>
+          </div>
           <div className="text-center space-y-4 animate-slide-up">
             <div className="flex items-center justify-center gap-3 mb-6">
               <div className="relative">
@@ -216,10 +233,20 @@ const Index = () => {
 
           {currentStep === 1 && showDashboard && (
             <div className="animate-scale-in">
-              <Dashboard onBack={() => {
-                setCurrentStep(0);
-                setShowDashboard(false);
-              }} />
+              <Dashboard 
+                formData={formData}
+                setFormData={setFormData}
+                results={results}
+                setResults={setResults}
+                chatHistory={chatHistory}
+                setChatHistory={setChatHistory}
+                hasCompletedForm={hasCompletedForm}
+                setHasCompletedForm={setHasCompletedForm}
+                onBack={() => {
+                  setCurrentStep(0);
+                  setShowDashboard(false);
+                }} 
+              />
             </div>
           )}
         </div>

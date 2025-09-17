@@ -34,17 +34,24 @@ interface AIChatProps {
     interests: string;
     goals: string;
   } | null;
+  chatHistory: any[];
+  setChatHistory: (history: any[]) => void;
 }
 
-export const AIChat = ({ profile }: AIChatProps) => {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      content: `Hi ${profile?.name || 'there'}! I'm CareerGenie, your AI career advisor. I've analyzed your profile and I'm ready to help you with career guidance, skill development, job search strategies, and more. What would you like to discuss?`,
-      sender: 'ai',
-      timestamp: new Date()
+export const AIChat = ({ profile, chatHistory, setChatHistory }: AIChatProps) => {
+  const [messages, setMessages] = useState<Message[]>(() => {
+    if (chatHistory.length > 0) {
+      return chatHistory;
     }
-  ]);
+    return [
+      {
+        id: '1',
+        content: `Hi ${profile?.name || 'there'}! I'm CareerGenie, your AI career advisor. I've analyzed your profile and I'm ready to help you with career guidance, skill development, job search strategies, and more. What would you like to discuss?`,
+        sender: 'ai',
+        timestamp: new Date()
+      }
+    ];
+  });
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
@@ -145,7 +152,9 @@ export const AIChat = ({ profile }: AIChatProps) => {
       timestamp: new Date()
     };
 
-    setMessages(prev => [...prev, userMessage]);
+    const newMessages = [...messages, userMessage];
+    setMessages(newMessages);
+    setChatHistory(newMessages);
     setInputValue('');
     setIsTyping(true);
 
@@ -158,7 +167,9 @@ export const AIChat = ({ profile }: AIChatProps) => {
         timestamp: new Date()
       };
       
-      setMessages(prev => [...prev, aiResponse]);
+      const finalMessages = [...newMessages, aiResponse];
+      setMessages(finalMessages);
+      setChatHistory(finalMessages);
       setIsTyping(false);
     }, 1000 + Math.random() * 1000); // 1-2 second delay
   };

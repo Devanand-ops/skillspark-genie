@@ -9,22 +9,41 @@ import { AIChat } from "@/components/AIChat";
 
 interface DashboardProps {
   onBack: () => void;
+  formData: any;
+  setFormData: (data: any) => void;
+  results: any;
+  setResults: (results: any) => void;
+  chatHistory: any[];
+  setChatHistory: (history: any[]) => void;
+  hasCompletedForm: boolean;
+  setHasCompletedForm: (completed: boolean) => void;
 }
 
-const Dashboard = ({ onBack }: DashboardProps) => {
-  const [activeTab, setActiveTab] = useState('profile');
-  const [userProfile, setUserProfile] = useState(null);
-  const [showResults, setShowResults] = useState(false);
+const Dashboard = ({ 
+  onBack, 
+  formData, 
+  setFormData, 
+  results, 
+  setResults, 
+  chatHistory, 
+  setChatHistory, 
+  hasCompletedForm, 
+  setHasCompletedForm 
+}: DashboardProps) => {
+  const [activeTab, setActiveTab] = useState(() => {
+    if (hasCompletedForm && results) return 'results';
+    return 'profile';
+  });
 
   const tabs = [
     { id: 'profile', label: 'Profile Setup', icon: Users, description: 'Complete your career profile' },
-    { id: 'results', label: 'Career Results', icon: Trophy, description: 'View your personalized recommendations', disabled: !showResults },
-    { id: 'chat', label: 'AI Advisor', icon: MessageCircle, description: 'Chat with your career advisor', disabled: !showResults }
+    { id: 'results', label: 'Career Results', icon: Trophy, description: 'View your personalized recommendations', disabled: !hasCompletedForm },
+    { id: 'chat', label: 'AI Advisor', icon: MessageCircle, description: 'Chat with your career advisor', disabled: !hasCompletedForm }
   ];
 
   const handleFormSubmit = (profile: any) => {
-    setUserProfile(profile);
-    setShowResults(true);
+    setFormData(profile);
+    setHasCompletedForm(true);
     setActiveTab('results');
   };
 
@@ -102,18 +121,24 @@ const Dashboard = ({ onBack }: DashboardProps) => {
           </div>
         )}
 
-        {activeTab === 'results' && showResults && userProfile && (
+        {activeTab === 'results' && hasCompletedForm && formData && (
           <div className="animate-scale-in">
             <CareerResults 
-              profile={userProfile} 
+              profile={formData} 
+              results={results}
+              setResults={setResults}
               onStartChat={handleStartChat} 
             />
           </div>
         )}
 
-        {activeTab === 'chat' && showResults && userProfile && (
+        {activeTab === 'chat' && hasCompletedForm && formData && (
           <div className="animate-scale-in">
-            <AIChat profile={userProfile} />
+            <AIChat 
+              profile={formData} 
+              chatHistory={chatHistory}
+              setChatHistory={setChatHistory}
+            />
           </div>
         )}
       </div>
